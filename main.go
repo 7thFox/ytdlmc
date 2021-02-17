@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	config    = flag.String("config", "~/.config/youtube-dl-multiconfig", "The path to your config file")
+	config    = flag.String("config", "~/.config/youtube-dl-multiconfig/config", "The path to your config file")
 	simulate  = flag.Bool("simulate", false, "Print command and don't execute")
 	tempFiles []*os.File
 )
