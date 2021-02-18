@@ -61,8 +61,6 @@ func main() {
 	}
 
 	log.Println("Done.")
-
-	fmt.Scanln()
 }
 
 func getCommandString(args []string) string {
@@ -107,7 +105,6 @@ func writeField(opt string, fval reflect.Value, args []string) []string {
 	case reflect.Int:
 		return append(args, "--"+opt, fmt.Sprintf("%d", fval.Int()))
 	case reflect.Slice:
-		log.Println(opt)
 		if opt == "batch-file" {
 			file, err := ioutil.TempFile(os.TempDir(), "youtube-dl-multiconfig-*")
 			if err != nil {
