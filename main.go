@@ -14,9 +14,10 @@ import (
 )
 
 var (
-	config    = flag.String("config", "~/.config/youtube-dl-multiconfig/config", "The path to your config file")
-	simulate  = flag.Bool("simulate", false, "Print command and don't execute")
-	tempFiles []*os.File
+	downloader = flag.String("downloader", "youtube-dl", "The downloader to use. Technically only build to work for 'youtube-dl', but forks like 'yt-dlp' work for most things")
+	config     = flag.String("config", "~/.config/youtube-dl-multiconfig/config", "The path to your config file")
+	simulate   = flag.Bool("simulate", false, "Print command and don't execute")
+	tempFiles  []*os.File
 )
 
 func main() {
@@ -47,7 +48,7 @@ func main() {
 		if *simulate {
 			log.Println(getCommandString(args))
 		} else {
-			cmd := exec.Command("youtube-dl", args...)
+			cmd := exec.Command(*downloader, args...)
 			cmd.Stderr = os.Stderr
 			cmd.Stdout = os.Stdout
 
@@ -65,7 +66,7 @@ func main() {
 
 func getCommandString(args []string) string {
 	var sb strings.Builder
-	sb.WriteString("youtube-dl")
+	sb.WriteString(*downloader)
 	for _, arg := range args {
 		sb.WriteRune(' ')
 		sb.WriteString(arg)

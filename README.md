@@ -7,9 +7,10 @@ This project was partially inspired by the nice guide by Erik Ellsinger on [auto
 
 # options
 ```
-Usage of bin/youtube-dl-multiconfig:
   -config string
-        The path to your config file (default "~/.config/youtube-dl-multiconfig")
+        The path to your config file (default "~/.config/youtube-dl-multiconfig/config")
+  -downloader string
+        The downloader to use. Technically only build to work for 'youtube-dl', but forks like 'yt-dlp' work for most things (default "youtube-dl")
   -simulate
         Print command and don't execute
 ```
@@ -32,5 +33,6 @@ One final point of note is that Go is very pedantic about it's JSON, and will no
 See `example.json` to view a sample config.
 
 # todo
+ - Add support for `yt-dlp` and change default downloader
  - Add functionality to remove existing videos older than N days
  - Potentially allow constants to be shared across config groups
