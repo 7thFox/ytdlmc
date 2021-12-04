@@ -26,6 +26,8 @@ on each of them. The only option straying from this is `batch-file`:
 ```
 Which will instead take an array of strings.
 
+One final point of note is that Go is very pedantic about it's JSON, and will not except trailing commas or comments.
+
 # example
 See `example.json` to view a sample config.
 
