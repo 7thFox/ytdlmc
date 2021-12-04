@@ -16,6 +16,8 @@ This project was partially inspired by the nice guide by Erik Ellsinger on [auto
 ```
 
 # config
+NOTE: Go is very pedantic about it's JSON, and will not except trailing commas or comments!
+
 Configuration is done within named "config groups". All parameters are entered as they would be in the command
 line, and you can view [youtube-dl documentation](https://github.com/ytdl-org/youtube-dl#options) for info 
 on each of them. The only option straying from this is `batch-file`: 
@@ -27,7 +29,10 @@ on each of them. The only option straying from this is `batch-file`:
 ```
 Which will instead take an array of strings.
 
-One final point of note is that Go is very pedantic about it's JSON, and will not except trailing commas or comments.
+## additional json elements
+In addition to the youtube-dl options, some extra elements are available for the json config:
+ - `disable` - Skips the group, allowing you to effectively comment it out
+ - `comment` - Field is ignored, but allows you to add a comment describing the config group
 
 # example
 See `example.json` to view a sample config.

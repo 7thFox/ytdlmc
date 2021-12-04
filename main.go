@@ -43,6 +43,11 @@ func main() {
 	}
 
 	for name, group := range groups {
+		if group.DisableGroup {
+			log.Printf("Skipping disabled group %s.", name)
+			continue
+		}
+
 		log.Printf("Processing %s...\n", name)
 		args := getArgs(group)
 		if *simulate {
@@ -135,7 +140,11 @@ Err:
 }
 
 type ConfigGroup struct {
-	// TODO JOSH
+	// Tool options:
+	DisableGroup bool   `json:"disable"`
+	Comment      string `json:"comment"`
+
+	// Custom Implementation:
 	BatchFile []string `json:"batch-file" option:"batch-file"`
 
 	Help                       bool `json:"help" option:"help"`

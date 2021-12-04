@@ -1,32 +1,48 @@
 {
-    "recent_uploads": 
+    "recent_uploads":
     {
         "batch-file": [
-            "https://www.youtube.com/c/videogamedunkey/videos",
-            "https://www.youtube.com/c/Fatmagic/videos"
+            "https://www.youtube.com/user/videogamedunkey/videos",
+            "https://www.youtube.com/c/BenEater/videos"
         ],
         "output": "/opt/downloads/%(uploader)s/%(uploader)s-%(title)s-%(upload_date)s.%(ext)s",
         "dateafter": "now-1days",
-        "download-archive": "/opt/archive",
+        "download-archive": "/opt/appdata/archive",
         "add-metadata": true,
         "write-thumbnail": true,
         "playlist-end": 10,
         "ignore-errors": true,
-        "cookies": "/opt/cookies",
+        "cookies": "/opt/appdata/cookies",
         "limit-rate": "2M"
     },
-    "archive_all":
+    "archive_get_recent":
     {
+        "comment": "Get all videos and archive; modified to be faster and not pull all pages",
         "batch-file": [
             "https://www.youtube.com/c/LukeSmithxyz/videos"
         ],
         "output": "/opt/downloads/%(uploader)s/%(uploader)s-%(title)s-%(upload_date)s.%(ext)s",
-        "download-archive": "/opt/archive",
+        "download-archive": "/opt/appdata/archive",
         "add-metadata": true,
         "write-thumbnail": true,
         "playlist-end": 10,
         "ignore-errors": true,
-        "cookies": "/opt/cookies",
+        "cookies": "/opt/appdata/cookies",
         "limit-rate": "2M"
+    },
+    "archive_get_all":
+    {
+        "comment": "Get all videos and archive; pulls all pages (slow) and without limit (will eat up bandwidth). Should be disabled except when adding new elements to archive_get_recent",
+        "disable": true,
+
+        "batch-file": [
+            "https://www.youtube.com/c/LukeSmithxyz/videos"
+        ],
+        "output": "/opt/downloads/%(uploader)s/%(uploader)s-%(title)s-%(upload_date)s.%(ext)s",
+        "download-archive": "/opt/appdata/archive",
+        "add-metadata": true,
+        "write-thumbnail": true,
+        "ignore-errors": true,
+        "cookies": "/opt/appdata/cookies"
     }
 }

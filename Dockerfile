@@ -1,5 +1,5 @@
 FROM golang:1.17-buster
-VOLUME [ "/opt/config", "/opt/log", "/opt/downloads" ]
+VOLUME [ "/opt/appdata", "/opt/log", "/opt/downloads" ]
 
 # Install packages needed for container
 RUN apt-get update && \
@@ -9,7 +9,7 @@ RUN git clone https://github.com/7thFox/youtube-dl-multiconfig /opt/src
 # Setup Cron
 RUN touch /var/log/cron.log
 ARG CRONTIME="*/15 * * * *"
-RUN echo "${CRONTIME} root      echo \"[\$(date --rfc-3339=seconds)] Checking for new videos\" >> /opt/log/ytdlmc.log && /opt/src/bin/ytdlmc -downloader=yt-dlp --config /opt/config/config.json >> /opt/log/ytdlmc.log 2>&1" >> /etc/crontab
+RUN echo "${CRONTIME} root      echo \"[\$(date --rfc-3339=seconds)] Checking for new videos\" >> /opt/log/ytdlmc.log && /opt/src/bin/ytdlmc -downloader=yt-dlp --config /opt/appdata/config.json >> /opt/log/ytdlmc.log 2>&1" >> /etc/crontab
 
 # we name it youtube-dl so it aliases
 ADD "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp" /usr/local/bin/yt-dlp
