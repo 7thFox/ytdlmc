@@ -38,6 +38,6 @@ In addition to the youtube-dl options, some extra elements are available for the
 See `example.json` to view a sample config.
 
 # todo
- - Add support for `yt-dlp` and change default downloader
+ - Add support for [yt-dlp](https://github.com/yt-dlp/yt-dlp) and change default downloader
  - Allow sub-config groups to inherit settings
  - Add functionality to remove existing videos older than N days
