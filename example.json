@@ -1,6 +1,8 @@
 {
     "recent_uploads":
     {
+        "format": "bestvideo[height<=1080]+bestaudio",
+        "merge-output-format": "mkv",
         "batch-file": [
             "https://www.youtube.com/user/videogamedunkey/videos",
             "https://www.youtube.com/c/BenEater/videos"
@@ -18,6 +20,9 @@
     "archive_get_recent":
     {
         "comment": "Get all videos and archive; modified to be faster and not pull all pages",
+
+        "format": "bestvideo[height<=1080]+bestaudio",
+        "merge-output-format": "mkv",
         "batch-file": [
             "https://www.youtube.com/c/LukeSmithxyz/videos"
         ],
@@ -35,6 +40,8 @@
         "comment": "Get all videos and archive; pulls all pages (slow) and without limit (will eat up bandwidth). Should be disabled except when adding new elements to archive_get_recent",
         "disable": true,
 
+        "format": "bestvideo[height<=1080]+bestaudio",
+        "merge-output-format": "mkv",
         "batch-file": [
             "https://www.youtube.com/c/LukeSmithxyz/videos"
         ],

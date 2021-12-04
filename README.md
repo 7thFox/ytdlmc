@@ -39,5 +39,5 @@ See `example.json` to view a sample config.
 
 # todo
  - Add support for `yt-dlp` and change default downloader
+ - Allow sub-config groups to inherit settings
  - Add functionality to remove existing videos older than N days
- - Potentially allow constants to be shared across config groups
