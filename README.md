@@ -1,4 +1,4 @@
-# youtube-dl-multiconfig
+# ytdlmc (youtube-dl-multiconfig)
 youtube-dl has some really great and powerful auto config options to automate downloading YouTube videos.
 However, there is not apparent support to configure youtube-dl on a per-playlist basis, so this project aims
 to fill that gap.
@@ -8,7 +8,7 @@ This project was partially inspired by the nice guide by Erik Ellsinger on [auto
 # options
 ```
   -config string
-        The path to your config file (default "~/.config/youtube-dl-multiconfig/config")
+        The path to your config file (default "~/.config/ytdlmc/config")
   -downloader string
         The downloader to use. Technically only build to work for 'youtube-dl', but forks like 'yt-dlp' work for most things (default "youtube-dl")
   -simulate

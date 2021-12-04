@@ -4,7 +4,7 @@ VOLUME [ "/opt/appdata", "/opt/log", "/opt/downloads" ]
 # Install packages needed for container
 RUN apt-get update && \
     apt-get install -y --no-install-recommends cron ffmpeg python3
-RUN git clone https://github.com/7thFox/youtube-dl-multiconfig /opt/src
+RUN git clone https://github.com/7thFox/ytdlmc /opt/src
 
 # Setup Cron
 RUN touch /var/log/cron.log

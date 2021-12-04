@@ -15,7 +15,7 @@ import (
 
 var (
 	downloader = flag.String("downloader", "youtube-dl", "The downloader to use. Technically only build to work for 'youtube-dl', but forks like 'yt-dlp' work for most things")
-	config     = flag.String("config", "~/.config/youtube-dl-multiconfig/config", "The path to your config file")
+	config     = flag.String("config", "~/.config/ytdlmc/config", "The path to your config file")
 	simulate   = flag.Bool("simulate", false, "Print command and don't execute")
 	tempFiles  []*os.File
 )
@@ -112,7 +112,7 @@ func writeField(opt string, fval reflect.Value, args []string) []string {
 		return append(args, "--"+opt, fmt.Sprintf("%d", fval.Int()))
 	case reflect.Slice:
 		if opt == "batch-file" {
-			file, err := ioutil.TempFile(os.TempDir(), "youtube-dl-multiconfig-*")
+			file, err := ioutil.TempFile(os.TempDir(), "ytdlmc-*")
 			if err != nil {
 				log.Fatalf("Failed to create temp file: %s\n", err.Error())
 			}
