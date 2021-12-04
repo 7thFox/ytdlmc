@@ -5,15 +5,26 @@ to fill that gap.
 
 This project was partially inspired by the nice guide by Erik Ellsinger on [auto-downloading videos](https://erik.ellsinger.me/automatically-download-youtube-videos-to-plex-on-truenas-using-youtube-dl/) on TrueNAS
 
-# config setup
+# options
+```
+Usage of bin/youtube-dl-multiconfig:
+  -config string
+        The path to your config file (default "~/.config/youtube-dl-multiconfig")
+  -simulate
+        Print command and don't execute
+```
+
+# config
 Configuration is done within named "config groups". All parameters are entered as they would be in the command
-line, and you can view youtube-dl documentation for info on each of them. The only option straying from this is
-`batch-file` which will instead take an array of strings. These will be written to a temp file at runtime before
-the file name is passed into `youtube-dl`
-
-View youtube-dl options: [https://github.com/ytdl-org/youtube-dl#description](https://github.com/ytdl-org/youtube-dl#description)
-
-By default the program looks at `~/.config/youtube-dl-multiconfig/config` but this may be changed via the `--config` option.
+line, and you can view [youtube-dl documentation](https://github.com/ytdl-org/youtube-dl#options) for info 
+on each of them. The only option straying from this is `batch-file`: 
+```
+-a, --batch-file FILE                File containing URLs to download ('-'
+                                     for stdin), one URL per line. Lines
+                                     starting with '#', ';' or ']' are
+                                     considered as comments and ignored.
+```
+Which will instead take an array of strings.
 
 # example
 See `example.json` to view a sample config.
