@@ -5,14 +5,14 @@
             "https://www.youtube.com/c/videogamedunkey/videos",
             "https://www.youtube.com/c/Fatmagic/videos"
         ],
-        "output": "/home/josh/src/youtube-dl-multiconfig/test/youtube/%(uploader)s/%(uploader)s-%(title)s-%(upload_date)s.%(ext)s",
+        "output": "/opt/downloads/%(uploader)s/%(uploader)s-%(title)s-%(upload_date)s.%(ext)s",
         "dateafter": "now-1days",
-        "download-archive": "~/.config/youtube-dl/archive",
+        "download-archive": "/opt/archive",
         "add-metadata": true,
         "write-thumbnail": true,
         "playlist-end": 10,
         "ignore-errors": true,
-        "cookies": "~/.config/youtube-dl/cookies",
+        "cookies": "/opt/cookies",
         "limit-rate": "2M"
     },
     "archive_all":
@@ -20,13 +20,13 @@
         "batch-file": [
             "https://www.youtube.com/c/LukeSmithxyz/videos"
         ],
-        "output": "/home/josh/src/youtube-dl-multiconfig/test/youtube/%(uploader)s/%(uploader)s-%(title)s-%(upload_date)s.%(ext)s",
-        "download-archive": "~/.config/youtube-dl/archive",
+        "output": "/opt/downloads/%(uploader)s/%(uploader)s-%(title)s-%(upload_date)s.%(ext)s",
+        "download-archive": "/opt/archive",
         "add-metadata": true,
         "write-thumbnail": true,
         "playlist-end": 10,
         "ignore-errors": true,
-        "cookies": "~/.config/youtube-dl/cookies",
+        "cookies": "/opt/cookies",
         "limit-rate": "2M"
     }
 }
