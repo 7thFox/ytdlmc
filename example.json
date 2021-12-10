@@ -15,7 +15,8 @@
         "playlist-end": 10,
         "ignore-errors": true,
         "cookies": "/opt/appdata/cookies",
-        "limit-rate": "2M"
+        "limit-rate": "2M",
+        "no-progress": true
     },
     "archive_get_recent":
     {
@@ -33,7 +34,8 @@
         "playlist-end": 10,
         "ignore-errors": true,
         "cookies": "/opt/appdata/cookies",
-        "limit-rate": "2M"
+        "limit-rate": "2M",
+        "no-progress": true
     },
     "archive_get_all":
     {
@@ -50,6 +52,7 @@
         "add-metadata": true,
         "write-thumbnail": true,
         "ignore-errors": true,
-        "cookies": "/opt/appdata/cookies"
+        "cookies": "/opt/appdata/cookies",
+        "no-progress": true
     }
 }
