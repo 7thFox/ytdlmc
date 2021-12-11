@@ -5,37 +5,42 @@
         "merge-output-format": "mkv",
         "batch-file": [
             "https://www.youtube.com/user/videogamedunkey/videos",
-            "https://www.youtube.com/c/BenEater/videos"
+            "https://www.youtube.com/c/Eastory/videos",
+            "https://www.youtube.com/c/MattKC/videos",
+            "https://www.youtube.com/c/TonyZaret/videos"
         ],
-        "output": "/opt/downloads/%(uploader)s/%(uploader)s-%(title)s-%(upload_date)s.%(ext)s",
+        "output": "/opt/downloads/%(uploader)s/%(upload_date)s-%(uploader)s-%(title)s-%(id)s.%(ext)s",
         "dateafter": "now-1days",
         "download-archive": "/opt/appdata/archive",
         "add-metadata": true,
-        "write-thumbnail": true,
-        "playlist-end": 10,
+        "playlist-end": 5,
         "ignore-errors": true,
         "cookies": "/opt/appdata/cookies",
         "limit-rate": "2M",
-        "no-progress": true
+        "no-progress": true,
+        "cache-dir": "/opt/appdata/cache",
+        "embed-thumbnail": true
     },
     "archive_get_recent":
     {
         "comment": "Get all videos and archive; modified to be faster and not pull all pages",
+        "disable": false,
 
         "format": "bestvideo[height<=1080]+bestaudio",
         "merge-output-format": "mkv",
         "batch-file": [
-            "https://www.youtube.com/c/LukeSmithxyz/videos"
+            "https://www.youtube.com/c/BenEater/videos"
         ],
-        "output": "/opt/downloads/%(uploader)s/%(uploader)s-%(title)s-%(upload_date)s.%(ext)s",
+        "output": "/opt/downloads/%(uploader)s/%(upload_date)s-%(uploader)s-%(title)s-%(id)s.%(ext)s",
         "download-archive": "/opt/appdata/archive",
         "add-metadata": true,
-        "write-thumbnail": true,
-        "playlist-end": 10,
+        "playlist-end": 5,
         "ignore-errors": true,
         "cookies": "/opt/appdata/cookies",
         "limit-rate": "2M",
-        "no-progress": true
+        "no-progress": true,
+        "cache-dir": "/opt/appdata/cache",
+        "embed-thumbnail": true
     },
     "archive_get_all":
     {
@@ -45,14 +50,15 @@
         "format": "bestvideo[height<=1080]+bestaudio",
         "merge-output-format": "mkv",
         "batch-file": [
-            "https://www.youtube.com/c/LukeSmithxyz/videos"
+            "https://www.youtube.com/c/BenEater/videos"
         ],
-        "output": "/opt/downloads/%(uploader)s/%(uploader)s-%(title)s-%(upload_date)s.%(ext)s",
+        "output": "/opt/downloads/%(uploader)s/%(upload_date)s-%(uploader)s-%(title)s-%(id)s.%(ext)s",
         "download-archive": "/opt/appdata/archive",
         "add-metadata": true,
-        "write-thumbnail": true,
         "ignore-errors": true,
         "cookies": "/opt/appdata/cookies",
-        "no-progress": true
+        "no-progress": true,
+        "cache-dir": "/opt/appdata/cache",
+        "embed-thumbnail": true
     }
 }
