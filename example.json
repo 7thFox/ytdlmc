@@ -1,64 +1,51 @@
 {
-    "recent_uploads":
+    "master":
     {
+        "comment": "Default settings for all downloads",
         "format": "bestvideo[height<=1080]+bestaudio",
         "merge-output-format": "mkv",
-        "batch-file": [
-            "https://www.youtube.com/user/videogamedunkey/videos",
-            "https://www.youtube.com/c/Eastory/videos",
-            "https://www.youtube.com/c/MattKC/videos",
-            "https://www.youtube.com/c/TonyZaret/videos"
-        ],
         "output": "/opt/downloads/%(uploader)s/%(upload_date)s-%(uploader)s-%(title)s-%(id)s.%(ext)s",
-        "dateafter": "now-1days",
         "download-archive": "/opt/appdata/archive",
         "add-metadata": true,
-        "playlist-end": 5,
-        "ignore-errors": true,
         "cookies": "/opt/appdata/cookies",
-        "limit-rate": "2M",
         "no-progress": true,
         "cache-dir": "/opt/appdata/cache",
-        "embed-thumbnail": true
-    },
-    "archive_get_recent":
-    {
-        "comment": "Get all videos and archive; modified to be faster and not pull all pages",
-        "disable": false,
+        "ignore-errors": true,
+        "embed-thumbnail": true,
 
-        "format": "bestvideo[height<=1080]+bestaudio",
-        "merge-output-format": "mkv",
-        "batch-file": [
-            "https://www.youtube.com/c/BenEater/videos"
-        ],
-        "output": "/opt/downloads/%(uploader)s/%(upload_date)s-%(uploader)s-%(title)s-%(id)s.%(ext)s",
-        "download-archive": "/opt/appdata/archive",
-        "add-metadata": true,
-        "playlist-end": 5,
-        "ignore-errors": true,
-        "cookies": "/opt/appdata/cookies",
-        "limit-rate": "2M",
-        "no-progress": true,
-        "cache-dir": "/opt/appdata/cache",
-        "embed-thumbnail": true
-    },
-    "archive_get_all":
-    {
-        "comment": "Get all videos and archive; pulls all pages (slow) and without limit (will eat up bandwidth). Should be disabled except when adding new elements to archive_get_recent",
-        "disable": true,
+        "subgroups": {
+            "archive_get_all":
+            {
+                "comment": "Get all videos and archive; pulls all pages (slow) and without limit (will eat up bandwidth). Should be disabled except when adding new elements to archive_get_recent",
+                "disable": false,
+                "batch-file": [
+                    "# You can place comments in the batch file too (just look at youtube-dl's documentation on it)",
+                    "https://www.youtube.com/c/BenEater/videos"
+                ]
+            },
+            "rate-limited": {
+                "comment": "Get videos with a rate limit and only check the first few videos to see if they're in range",
 
-        "format": "bestvideo[height<=1080]+bestaudio",
-        "merge-output-format": "mkv",
-        "batch-file": [
-            "https://www.youtube.com/c/BenEater/videos"
-        ],
-        "output": "/opt/downloads/%(uploader)s/%(upload_date)s-%(uploader)s-%(title)s-%(id)s.%(ext)s",
-        "download-archive": "/opt/appdata/archive",
-        "add-metadata": true,
-        "ignore-errors": true,
-        "cookies": "/opt/appdata/cookies",
-        "no-progress": true,
-        "cache-dir": "/opt/appdata/cache",
-        "embed-thumbnail": true
+                "playlist-end": 5,
+                "limit-rate": "2M",
+                "batch-file": [
+                    "# Don't limit date:",
+                    "https://www.youtube.com/c/BenEater/videos"
+                ],
+                "subgroups": {
+                    "recent_uploads":
+                    {
+                        "comment": "Don't download backlog",
+                        "dateafter": "now-1days",
+                        "batch-file": [
+                            "https://www.youtube.com/user/videogamedunkey/videos",
+                            "https://www.youtube.com/c/Eastory/videos",
+                            "https://www.youtube.com/c/MattKC/videos",
+                            "https://www.youtube.com/c/TonyZaret/videos"
+                        ]
+                    }
+                }
+            }
+        }
     }
 }

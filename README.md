@@ -31,13 +31,28 @@ Which will instead take an array of strings.
 
 ## additional json elements
 In addition to the youtube-dl options, some extra elements are available for the json config:
- - `disable` - Skips the group, allowing you to effectively comment it out
- - `comment` - Field is ignored, but allows you to add a comment describing the config group
+ - `disable` - Skips the group, allowing you to effectively comment it out.
+ - `comment` - Field is ignored, but allows you to add a comment describing the config group.
+ - `subgroups` - Another set of name-group pairs which inherit all the values of the parent group. If parent is disabled, subgroups are skipped.
 
 # example
 See `example.json` to view a sample config.
 
+# docker
+A docker build is available on dockerhub. In short, it just downloads the latest of `yt-dlp` and sets up a Cron task for performing downloads
+
+Volumes:
+ - `/opt/appdata`: Not used directly by the container, but where you should map things like cookies/cache/archive data.
+ - `/opt/log`: Where the log file will be written
+ - `/opt/downloads`: Not used directly, but where you should map any of your file downloads
+
+Environment params (`--env, -e`):
+ - `CRONTTIME`: The cron task setup (Defaults to `*/30 * * * *`)
+
 # todo
- - Add support for [yt-dlp](https://github.com/yt-dlp/yt-dlp) and change default downloader
- - Allow sub-config groups to inherit settings
- - Add functionality to remove existing videos older than N days
+
+⬜️ Add support for [yt-dlp](https://github.com/yt-dlp/yt-dlp) and change default downloader
+
+✅ Allow sub-config groups to inherit settings
+
+⬜️ Add functionality to remove existing videos older than N days

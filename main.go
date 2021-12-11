@@ -30,6 +30,9 @@ func main() {
 	}()
 
 	log.SetFlags(0)
+	log.SetOutput(new(customLogger))
+	// log.SetFlags(log.Ldate | log.time)
+	// log.SetPrefix("[ytdlmc] ")
 	flag.Parse()
 
 	file, err := ioutil.ReadFile(*config)
@@ -42,6 +45,15 @@ func main() {
 		log.Fatalf("Error parsing file: %s\n", err.Error())
 	}
 
+	runGroups(groups, nil)
+
+	log.Println("Done.")
+}
+
+func runGroups(groups map[string]ConfigGroup, parent *ConfigGroup) {
+	if groups == nil {
+		return
+	}
 	for name, group := range groups {
 		if group.DisableGroup {
 			log.Printf("Skipping disabled group %s.", name)
@@ -49,24 +61,30 @@ func main() {
 		}
 
 		log.Printf("Processing %s...\n", name)
-		args := getArgs(group)
-		if *simulate {
-			log.Println(getCommandString(args))
-		} else {
-			cmd := exec.Command(*downloader, args...)
-			cmd.Stderr = os.Stderr
-			cmd.Stdout = os.Stdout
+		if parent != nil {
+			group = mergeParent(group, *parent)
+		}
 
-			time.Sleep(500) // "Can't read file" error otherwise
+		if len(group.BatchFile) > 0 {
+			args := getArgs(group)
+			if *simulate {
+				log.Println(getCommandString(args))
+			} else {
+				cmd := exec.Command(*downloader, args...)
+				cmd.Stderr = os.Stderr
+				cmd.Stdout = os.Stdout
 
-			err = cmd.Run()
-			if err != nil {
-				log.Fatalf("Error executing command: %s\nCommand: %s\n", err.Error(), getCommandString(args))
+				time.Sleep(500) // "Can't read file" error otherwise
+
+				err := cmd.Run()
+				if err != nil {
+					log.Fatalf("Error executing command: %s\nCommand: %s\n", err.Error(), getCommandString(args))
+				}
 			}
 		}
-	}
 
-	log.Println("Done.")
+		runGroups(group.Subgroups, &group)
+	}
 }
 
 func getCommandString(args []string) string {
@@ -93,6 +111,26 @@ func getArgs(group ConfigGroup) []string {
 	}
 
 	return args
+}
+
+func mergeParent(child, parent ConfigGroup) ConfigGroup {
+	t := reflect.TypeOf(parent)
+	vc := reflect.ValueOf(&child).Elem()
+	vp := reflect.ValueOf(&parent).Elem()
+	nFields := t.NumField()
+	for i := 0; i < nFields; i++ {
+		f := t.Field(i)
+		if _, ok := f.Tag.Lookup("option"); ok {
+			pval := vp.Field(i)
+			cval := vc.Field(i)
+			if pval.Kind() == reflect.Ptr && !pval.IsNil() && cval.IsNil() {
+				cval.Set(reflect.New(pval.Type().Elem()))
+				cval.Elem().Set(pval.Elem())
+			}
+		}
+	}
+
+	return child
 }
 
 func writeField(opt string, fval reflect.Value, args []string) []string {
@@ -141,105 +179,106 @@ Err:
 
 type ConfigGroup struct {
 	// Tool options:
-	DisableGroup bool   `json:"disable"`
-	Comment      string `json:"comment"`
+	DisableGroup bool                   `json:"disable"`
+	Comment      string                 `json:"comment"`
+	Subgroups    map[string]ConfigGroup `json:"subgroups"`
 
 	// Custom Implementation:
 	BatchFile []string `json:"batch-file" option:"batch-file"`
 
-	Help                       bool `json:"help" option:"help"`
-	Version                    bool `json:"version" option:"version"`
-	Update                     bool `json:"update" option:"update"`
-	IgnoreErrors               bool `json:"ignore-errors" option:"ignore-errors"`
-	AbortOnError               bool `json:"abort-on-error" option:"abort-on-error"`
-	DumpUserAgent              bool `json:"dump-user-agent" option:"dump-user-agent"`
-	ListExtractors             bool `json:"list-extractors" option:"list-extractors"`
-	ExtractorDescriptions      bool `json:"extractor-descriptions" option:"extractor-descriptions"`
-	ForceGenericExtractor      bool `json:"force-generic-extractor" option:"force-generic-extractor"`
-	IgnoreConfig               bool `json:"ignore-config" option:"ignore-config"`
-	FlatPlaylist               bool `json:"flat-playlist" option:"flat-playlist"`
-	MarkWatched                bool `json:"mark-watched" option:"mark-watched"`
-	NoMarkWatched              bool `json:"no-mark-watched" option:"no-mark-watched"`
-	NoColor                    bool `json:"no-color" option:"no-color"`
-	ForceIPV4                  bool `json:"force-ipv4" option:"force-ipv4"`
-	ForceIPV6                  bool `json:"force-ipv6" option:"force-ipv6"`
-	GeoBypass                  bool `json:"geo-bypass" option:"geo-bypass"`
-	NoGeoBypass                bool `json:"no-geo-bypass" option:"no-geo-bypass"`
-	PlaylistReverse            bool `json:"playlist-reverse" option:"playlist-reverse"`
-	PlaylistRandom             bool `json:"playlist-random" option:"playlist-random"`
-	XattrSetFilesize           bool `json:"xattr-set-filesize" option:"xattr-set-filesize"`
-	HlsPreferNative            bool `json:"hls-prefer-native" option:"hls-prefer-native"`
-	HlsPreferFfmpeg            bool `json:"hls-prefer-ffmpeg" option:"hls-prefer-ffmpeg"`
-	HlsUseMpegts               bool `json:"hls-use-mpegts" option:"hls-use-mpegts"`
-	RestrictFilenames          bool `json:"restrict-filenames" option:"restrict-filenames"`
-	NoOverwrites               bool `json:"no-overwrites" option:"no-overwrites"`
-	Continue                   bool `json:"continue" option:"continue"`
-	NoContinue                 bool `json:"no-continue" option:"no-continue"`
-	NoPart                     bool `json:"no-part" option:"no-part"`
-	NoMtime                    bool `json:"no-mtime" option:"no-mtime"`
-	WriteDescription           bool `json:"write-description" option:"write-description"`
-	WriteInfoJSON              bool `json:"write-info-json" option:"write-info-json"`
-	WriteAnnotations           bool `json:"write-annotations" option:"write-annotations"`
-	NoCacheDir                 bool `json:"no-cache-dir" option:"no-cache-dir"`
-	RmCacheDir                 bool `json:"rm-cache-dir" option:"rm-cache-dir"`
-	WriteThumbnail             bool `json:"write-thumbnail" option:"write-thumbnail"`
-	WriteAllThumbnails         bool `json:"write-all-thumbnails" option:"write-all-thumbnails"`
-	ListThumbnails             bool `json:"list-thumbnails" option:"list-thumbnails"`
-	Quiet                      bool `json:"quiet" option:"quiet"`
-	NoWarnings                 bool `json:"no-warnings" option:"no-warnings"`
-	Simulate                   bool `json:"simulate" option:"simulate"`
-	SkipDownload               bool `json:"skip-download" option:"skip-download"`
-	GetURL                     bool `json:"get-url" option:"get-url"`
-	GetTitle                   bool `json:"get-title" option:"get-title"`
-	GetID                      bool `json:"get-id" option:"get-id"`
-	GetThumbnail               bool `json:"get-thumbnail" option:"get-thumbnail"`
-	GetDescription             bool `json:"get-description" option:"get-description"`
-	GetDuration                bool `json:"get-duration" option:"get-duration"`
-	GetFilename                bool `json:"get-filename" option:"get-filename"`
-	GetFormat                  bool `json:"get-format" option:"get-format"`
-	DumpJSON                   bool `json:"dump-json" option:"dump-json"`
-	DumpSingleJSON             bool `json:"dump-single-json" option:"dump-single-json"`
-	PrintJSON                  bool `json:"print-json" option:"print-json"`
-	Newline                    bool `json:"newline" option:"newline"`
-	NoProgress                 bool `json:"no-progress" option:"no-progress"`
-	ConsoleTitle               bool `json:"console-title" option:"console-title"`
-	Verbose                    bool `json:"verbose" option:"verbose"`
-	DumpPages                  bool `json:"dump-pages" option:"dump-pages"`
-	WritePages                 bool `json:"write-pages" option:"write-pages"`
-	PrintTraffic               bool `json:"print-traffic" option:"print-traffic"`
-	CallHome                   bool `json:"call-home" option:"call-home"`
-	NoCallHome                 bool `json:"no-call-home" option:"no-call-home"`
-	NoPlaylist                 bool `json:"no-playlist" option:"no-playlist"`
-	YesPlaylist                bool `json:"yes-playlist" option:"yes-playlist"`
-	IncludeAds                 bool `json:"include-ads" option:"include-ads"`
-	SkipUnavailableFragments   bool `json:"skip-unavailable-fragments" option:"skip-unavailable-fragments"`
-	AbortOnUnavailableFragment bool `json:"abort-on-unavailable-fragment" option:"abort-on-unavailable-fragment"`
-	KeepFragments              bool `json:"keep-fragments" option:"keep-fragments"`
-	NoResizeBuffer             bool `json:"no-resize-buffer" option:"no-resize-buffer"`
-	ID                         bool `json:"id" option:"id"`
-	NoCheckCertificate         bool `json:"no-check-certificate" option:"no-check-certificate"`
-	PreferInsecure             bool `json:"prefer-insecure" option:"prefer-insecure"`
-	AddHeader                  bool `json:"add-header" option:"add-header"`
-	BidiWorkaround             bool `json:"bidi-workaround" option:"bidi-workaround"`
-	AllFormats                 bool `json:"all-formats" option:"all-formats"`
-	PreferFreeFormats          bool `json:"prefer-free-formats" option:"prefer-free-formats"`
-	ListFormats                bool `json:"list-formats" option:"list-formats"`
-	YoutubeSkipDashManifest    bool `json:"youtube-skip-dash-manifest" option:"youtube-skip-dash-manifest"`
-	WriteSub                   bool `json:"write-sub" option:"write-sub"`
-	WriteAutoSub               bool `json:"write-auto-sub" option:"write-auto-sub"`
-	AllSubs                    bool `json:"all-subs" option:"all-subs"`
-	ListSubs                   bool `json:"list-subs" option:"list-subs"`
-	Netrc                      bool `json:"netrc" option:"netrc"`
-	ApListMso                  bool `json:"ap-list-mso" option:"ap-list-mso"`
-	ExtractAudio               bool `json:"extract-audio" option:"extract-audio"`
-	KeepVideo                  bool `json:"keep-video" option:"keep-video"`
-	NoPostOverwrites           bool `json:"no-post-overwrites" option:"no-post-overwrites"`
-	EmbedSubs                  bool `json:"embed-subs" option:"embed-subs"`
-	EmbedThumbnail             bool `json:"embed-thumbnail" option:"embed-thumbnail"`
-	AddMetadata                bool `json:"add-metadata" option:"add-metadata"`
-	Xattrs                     bool `json:"xattrs" option:"xattrs"`
-	PreferAvconv               bool `json:"prefer-avconv" option:"prefer-avconv"`
-	PreferFfmpeg               bool `json:"prefer-ffmpeg" option:"prefer-ffmpeg"`
+	Help                       *bool `json:"help" option:"help"`
+	Version                    *bool `json:"version" option:"version"`
+	Update                     *bool `json:"update" option:"update"`
+	IgnoreErrors               *bool `json:"ignore-errors" option:"ignore-errors"`
+	AbortOnError               *bool `json:"abort-on-error" option:"abort-on-error"`
+	DumpUserAgent              *bool `json:"dump-user-agent" option:"dump-user-agent"`
+	ListExtractors             *bool `json:"list-extractors" option:"list-extractors"`
+	ExtractorDescriptions      *bool `json:"extractor-descriptions" option:"extractor-descriptions"`
+	ForceGenericExtractor      *bool `json:"force-generic-extractor" option:"force-generic-extractor"`
+	IgnoreConfig               *bool `json:"ignore-config" option:"ignore-config"`
+	FlatPlaylist               *bool `json:"flat-playlist" option:"flat-playlist"`
+	MarkWatched                *bool `json:"mark-watched" option:"mark-watched"`
+	NoMarkWatched              *bool `json:"no-mark-watched" option:"no-mark-watched"`
+	NoColor                    *bool `json:"no-color" option:"no-color"`
+	ForceIPV4                  *bool `json:"force-ipv4" option:"force-ipv4"`
+	ForceIPV6                  *bool `json:"force-ipv6" option:"force-ipv6"`
+	GeoBypass                  *bool `json:"geo-bypass" option:"geo-bypass"`
+	NoGeoBypass                *bool `json:"no-geo-bypass" option:"no-geo-bypass"`
+	PlaylistReverse            *bool `json:"playlist-reverse" option:"playlist-reverse"`
+	PlaylistRandom             *bool `json:"playlist-random" option:"playlist-random"`
+	XattrSetFilesize           *bool `json:"xattr-set-filesize" option:"xattr-set-filesize"`
+	HlsPreferNative            *bool `json:"hls-prefer-native" option:"hls-prefer-native"`
+	HlsPreferFfmpeg            *bool `json:"hls-prefer-ffmpeg" option:"hls-prefer-ffmpeg"`
+	HlsUseMpegts               *bool `json:"hls-use-mpegts" option:"hls-use-mpegts"`
+	RestrictFilenames          *bool `json:"restrict-filenames" option:"restrict-filenames"`
+	NoOverwrites               *bool `json:"no-overwrites" option:"no-overwrites"`
+	Continue                   *bool `json:"continue" option:"continue"`
+	NoContinue                 *bool `json:"no-continue" option:"no-continue"`
+	NoPart                     *bool `json:"no-part" option:"no-part"`
+	NoMtime                    *bool `json:"no-mtime" option:"no-mtime"`
+	WriteDescription           *bool `json:"write-description" option:"write-description"`
+	WriteInfoJSON              *bool `json:"write-info-json" option:"write-info-json"`
+	WriteAnnotations           *bool `json:"write-annotations" option:"write-annotations"`
+	NoCacheDir                 *bool `json:"no-cache-dir" option:"no-cache-dir"`
+	RmCacheDir                 *bool `json:"rm-cache-dir" option:"rm-cache-dir"`
+	WriteThumbnail             *bool `json:"write-thumbnail" option:"write-thumbnail"`
+	WriteAllThumbnails         *bool `json:"write-all-thumbnails" option:"write-all-thumbnails"`
+	ListThumbnails             *bool `json:"list-thumbnails" option:"list-thumbnails"`
+	Quiet                      *bool `json:"quiet" option:"quiet"`
+	NoWarnings                 *bool `json:"no-warnings" option:"no-warnings"`
+	Simulate                   *bool `json:"simulate" option:"simulate"`
+	SkipDownload               *bool `json:"skip-download" option:"skip-download"`
+	GetURL                     *bool `json:"get-url" option:"get-url"`
+	GetTitle                   *bool `json:"get-title" option:"get-title"`
+	GetID                      *bool `json:"get-id" option:"get-id"`
+	GetThumbnail               *bool `json:"get-thumbnail" option:"get-thumbnail"`
+	GetDescription             *bool `json:"get-description" option:"get-description"`
+	GetDuration                *bool `json:"get-duration" option:"get-duration"`
+	GetFilename                *bool `json:"get-filename" option:"get-filename"`
+	GetFormat                  *bool `json:"get-format" option:"get-format"`
+	DumpJSON                   *bool `json:"dump-json" option:"dump-json"`
+	DumpSingleJSON             *bool `json:"dump-single-json" option:"dump-single-json"`
+	PrintJSON                  *bool `json:"print-json" option:"print-json"`
+	Newline                    *bool `json:"newline" option:"newline"`
+	NoProgress                 *bool `json:"no-progress" option:"no-progress"`
+	ConsoleTitle               *bool `json:"console-title" option:"console-title"`
+	Verbose                    *bool `json:"verbose" option:"verbose"`
+	DumpPages                  *bool `json:"dump-pages" option:"dump-pages"`
+	WritePages                 *bool `json:"write-pages" option:"write-pages"`
+	PrintTraffic               *bool `json:"print-traffic" option:"print-traffic"`
+	CallHome                   *bool `json:"call-home" option:"call-home"`
+	NoCallHome                 *bool `json:"no-call-home" option:"no-call-home"`
+	NoPlaylist                 *bool `json:"no-playlist" option:"no-playlist"`
+	YesPlaylist                *bool `json:"yes-playlist" option:"yes-playlist"`
+	IncludeAds                 *bool `json:"include-ads" option:"include-ads"`
+	SkipUnavailableFragments   *bool `json:"skip-unavailable-fragments" option:"skip-unavailable-fragments"`
+	AbortOnUnavailableFragment *bool `json:"abort-on-unavailable-fragment" option:"abort-on-unavailable-fragment"`
+	KeepFragments              *bool `json:"keep-fragments" option:"keep-fragments"`
+	NoResizeBuffer             *bool `json:"no-resize-buffer" option:"no-resize-buffer"`
+	ID                         *bool `json:"id" option:"id"`
+	NoCheckCertificate         *bool `json:"no-check-certificate" option:"no-check-certificate"`
+	PreferInsecure             *bool `json:"prefer-insecure" option:"prefer-insecure"`
+	AddHeader                  *bool `json:"add-header" option:"add-header"`
+	BidiWorkaround             *bool `json:"bidi-workaround" option:"bidi-workaround"`
+	AllFormats                 *bool `json:"all-formats" option:"all-formats"`
+	PreferFreeFormats          *bool `json:"prefer-free-formats" option:"prefer-free-formats"`
+	ListFormats                *bool `json:"list-formats" option:"list-formats"`
+	YoutubeSkipDashManifest    *bool `json:"youtube-skip-dash-manifest" option:"youtube-skip-dash-manifest"`
+	WriteSub                   *bool `json:"write-sub" option:"write-sub"`
+	WriteAutoSub               *bool `json:"write-auto-sub" option:"write-auto-sub"`
+	AllSubs                    *bool `json:"all-subs" option:"all-subs"`
+	ListSubs                   *bool `json:"list-subs" option:"list-subs"`
+	Netrc                      *bool `json:"netrc" option:"netrc"`
+	ApListMso                  *bool `json:"ap-list-mso" option:"ap-list-mso"`
+	ExtractAudio               *bool `json:"extract-audio" option:"extract-audio"`
+	KeepVideo                  *bool `json:"keep-video" option:"keep-video"`
+	NoPostOverwrites           *bool `json:"no-post-overwrites" option:"no-post-overwrites"`
+	EmbedSubs                  *bool `json:"embed-subs" option:"embed-subs"`
+	EmbedThumbnail             *bool `json:"embed-thumbnail" option:"embed-thumbnail"`
+	AddMetadata                *bool `json:"add-metadata" option:"add-metadata"`
+	Xattrs                     *bool `json:"xattrs" option:"xattrs"`
+	PreferAvconv               *bool `json:"prefer-avconv" option:"prefer-avconv"`
+	PreferFfmpeg               *bool `json:"prefer-ffmpeg" option:"prefer-ffmpeg"`
 
 	DefaultSearch          *string `json:"default-search" option:"default-search"`
 	ConfigLocation         *string `json:"config-location" option:"config-location"`
@@ -304,4 +343,10 @@ type ConfigGroup struct {
 	AutonumberStart  *int `json:"autonumber-start" option:"autonumber-start"`
 	SleepInterval    *int `json:"sleep-interval" option:"sleep-interval"`
 	MaxSleepInterval *int `json:"max-sleep-interval" option:"max-sleep-interval"`
+}
+
+type customLogger struct{}
+
+func (l customLogger) Write(bytes []byte) (int, error) {
+	return fmt.Print("[ytdlmc] " + time.Now().UTC().Format("2006-01-02T15:04:05.999Z") + ": " + string(bytes))
 }
