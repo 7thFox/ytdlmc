@@ -41,13 +41,13 @@ See `example.json` to view a sample config.
 # docker
 A docker build is available on dockerhub. In short, it just downloads the latest of `yt-dlp` and sets up a Cron task for performing downloads
 
-Volumes:
- - `/opt/appdata`: Not used directly by the container, but where you should map things like cookies/cache/archive data.
- - `/opt/log`: Where the log file will be written
- - `/opt/downloads`: Not used directly, but where you should map any of your file downloads
+## volumes
+ - `/opt/appdata` - Not used directly by the container, but where you should map things like cookies/cache/archive data.
+ - `/opt/log` - Where the log file will be written
+ - `/opt/downloads` - Not used directly, but where you should map any of your file downloads
 
-Environment params (`--env, -e`):
- - `CRONTTIME`: The cron task setup (Defaults to `*/30 * * * *`)
+## environment params (`--env, -e`):
+ - `CRONTTIME` - The cron task setup (Defaults to `*/30 * * * *`)
 
 # todo
 
